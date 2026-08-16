@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Klick</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-brand">
+        <span class="brand-name">KLICK</span>
+        <span class="brand-badge">HIGH FIDELITY</span>
+    </header>
+
+    <!-- Centerpiece: Active Switch & Waveform -->
+    <section class="active-switch-display">
+      <div class="waveform-underlay">
+        <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
+      </div>
+      <div id="active-switch-name" class="active-switch-name">Initializing...</div>
+      <div id="active-switch-metadata" class="active-switch-metadata">---</div>
+      
+      <!-- Test Input Area -->
+      <div class="test-input-area">
+        <input type="text" id="typing-area" class="test-input-box" placeholder="CLICK TO TEST" autocomplete="off" />
+        <div class="desktop-mode-hint">TYPE ANYWHERE TO HEAR KLICK</div>
+      </div>
+    </section>
+
+    <!-- Switch List (Middle) -->
+    <section class="switches-section">
+      <div class="section-label">RECORDINGS</div>
+      <div id="preset-selector-container"></div>
+    </section>
+
+    <!-- Audio Controls -->
+    <section class="controls-section">
+      <div id="volume-control" class="volume-container">
+        <!-- Rendered by VolumeControl.ts -->
+      </div>
+    </section>
+
+    <!-- Advanced Panels -->
+    <section class="advanced-section">
+      <div class="section-label">SYSTEM</div>
+      
+      <!-- Designer Toggle -->
+      <div class="panel-toggle" id="toggle-designer">
+        <span class="panel-toggle-text">TONE ARM SETTINGS</span>
+        <span class="panel-toggle-icon">▶</span>
+      </div>
+      <div class="panel-content" id="panel-designer">
+        <div id="designer-container"></div>
+        <div class="custom-actions">
+          <button id="btn-save-custom" class="ui-btn">Save as Custom</button>
+          <button id="btn-import-preset" class="ui-btn">Import</button>
+          <button id="btn-export-preset" class="ui-btn">Export</button>
+          <button id="btn-delete-custom" class="ui-btn" style="display: none; border-color: var(--status-muted); color: var(--status-muted);">Delete Custom</button>
+          <input type="file" id="file-import" accept=".json" style="display: none;" />
+        </div>
+      </div>
+
+      <!-- Settings Toggle -->
+      <div class="panel-toggle" id="toggle-settings">
+        <span class="panel-toggle-text">RECEIVER CONFIG</span>
+        <span class="panel-toggle-icon">▶</span>
+      </div>
+      <div class="panel-content" id="panel-settings">
+        
+        <div class="settings-group">
+          <div class="preset-group-label">BEHAVIOR</div>
+          <div class="settings-row">
+            <span class="settings-label">Auto-spin on startup (background)</span>
+            <input type="checkbox" id="autostart-toggle" class="ui-toggle" />
+          </div>
+        </div>
+        
+        <div class="settings-group">
+          <div class="preset-group-label">MUTE APPLICATIONS</div>
+          <div class="muted-apps-box">
+            <div id="muted-apps-list" class="muted-apps-list"></div>
+            <div class="muted-app-input-row">
+              <input type="text" id="muted-app-input" class="ui-input" placeholder="e.g. Code.exe" />
+              <button id="btn-add-muted-app" class="ui-btn">Mute App</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- Audio Init Overlay -->
+  <div id="audio-init-overlay" class="audio-init-overlay">
+    <div class="audio-init-text">CLICK TO INITIALIZE AUDIO</div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
