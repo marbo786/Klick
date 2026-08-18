@@ -1,11 +1,11 @@
+use crate::keyboard::active_app::get_active_app_name;
+use crate::keyboard::events::KeyboardEventPayload;
+use crate::keyboard::mapper::map_key;
+use rdev::{listen, Event, EventType};
 use std::collections::HashSet;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tauri::{AppHandle, Emitter};
-use rdev::{listen, Event, EventType};
-use crate::keyboard::events::KeyboardEventPayload;
-use crate::keyboard::mapper::map_key;
-use crate::keyboard::active_app::get_active_app_name;
 
 pub fn start_listener(app_handle: AppHandle) {
     std::thread::spawn(move || {
@@ -21,7 +21,9 @@ pub fn start_listener(app_handle: AppHandle) {
             match event.event_type {
                 EventType::KeyPress(key) => {
                     let key_id = map_key(key);
-                    if key_id == "Unknown" { return; }
+                    if key_id == "Unknown" {
+                        return;
+                    }
                     println!("Rust captured KeyPress: {}", key_id);
 
                     let repeat = {
@@ -38,7 +40,7 @@ pub fn start_listener(app_handle: AppHandle) {
 
                     let payload = KeyboardEventPayload {
                         event: "keydown".to_string(),
-                        key_id: key_id,
+                        key_id,
                         code: None,
                         timestamp,
                         repeat,
@@ -52,7 +54,9 @@ pub fn start_listener(app_handle: AppHandle) {
                 }
                 EventType::KeyRelease(key) => {
                     let key_id = map_key(key);
-                    if key_id == "Unknown" { return; }
+                    if key_id == "Unknown" {
+                        return;
+                    }
                     println!("Rust captured KeyRelease: {}", key_id);
 
                     {
@@ -64,7 +68,7 @@ pub fn start_listener(app_handle: AppHandle) {
 
                     let payload = KeyboardEventPayload {
                         event: "keyup".to_string(),
-                        key_id: key_id,
+                        key_id,
                         code: None,
                         timestamp,
                         repeat: false,

@@ -29,7 +29,7 @@ pub fn map_key(key: Key) -> String {
         Key::KeyX => "KeyX".to_string(),
         Key::KeyY => "KeyY".to_string(),
         Key::KeyZ => "KeyZ".to_string(),
-        
+
         Key::Num0 => "Digit0".to_string(),
         Key::Num1 => "Digit1".to_string(),
         Key::Num2 => "Digit2".to_string(),
@@ -40,13 +40,13 @@ pub fn map_key(key: Key) -> String {
         Key::Num7 => "Digit7".to_string(),
         Key::Num8 => "Digit8".to_string(),
         Key::Num9 => "Digit9".to_string(),
-        
+
         Key::Space => "Space".to_string(),
         Key::Return => "Enter".to_string(),
         Key::Backspace => "Backspace".to_string(),
         Key::Escape => "Escape".to_string(),
         Key::Tab => "Tab".to_string(),
-        
+
         Key::ShiftLeft => "ShiftLeft".to_string(),
         Key::ShiftRight => "ShiftRight".to_string(),
         Key::ControlLeft => "ControlLeft".to_string(),
@@ -55,7 +55,7 @@ pub fn map_key(key: Key) -> String {
         Key::AltGr => "AltRight".to_string(),
         Key::MetaLeft => "MetaLeft".to_string(),
         Key::MetaRight => "MetaRight".to_string(),
-        
+
         Key::UpArrow => "ArrowUp".to_string(),
         Key::DownArrow => "ArrowDown".to_string(),
         Key::LeftArrow => "ArrowLeft".to_string(),
@@ -64,7 +64,7 @@ pub fn map_key(key: Key) -> String {
         Key::PageDown => "PageDown".to_string(),
         Key::Home => "Home".to_string(),
         Key::End => "End".to_string(),
-        
+
         Key::F1 => "F1".to_string(),
         Key::F2 => "F2".to_string(),
         Key::F3 => "F3".to_string(),
@@ -77,7 +77,7 @@ pub fn map_key(key: Key) -> String {
         Key::F10 => "F10".to_string(),
         Key::F11 => "F11".to_string(),
         Key::F12 => "F12".to_string(),
-        
+
         Key::Minus => "Minus".to_string(),
         Key::Equal => "Equal".to_string(),
         Key::LeftBracket => "BracketLeft".to_string(),
@@ -89,7 +89,7 @@ pub fn map_key(key: Key) -> String {
         Key::Dot => "Period".to_string(),
         Key::Slash => "Slash".to_string(),
         Key::BackQuote => "Backquote".to_string(),
-        
+
         // Fallback for unknown keys
         _ => "Unknown".to_string(),
     }

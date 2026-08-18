@@ -3,7 +3,6 @@ import { AudioEngine } from '../synth/AudioEngine.ts';
 export class VolumeControl {
   private slider: HTMLInputElement;
   private readout: HTMLSpanElement;
-  private lastVolume: number = 0.5;
 
   private container: HTMLElement;
   private engine: AudioEngine;
@@ -33,7 +32,6 @@ export class VolumeControl {
     // Initialize based on engine current volume
     const currentVol = this.engine.getVolume();
     this.slider.value = Math.round(currentVol * 100).toString();
-    this.lastVolume = currentVol > 0 ? currentVol : 0.5;
 
     this.readout = document.createElement('span');
     this.readout.className = 'volume-label';
@@ -55,10 +53,6 @@ export class VolumeControl {
     
     this.engine.setVolume(volume);
     this.onChange(volume);
-    
-    if (volume > 0) {
-      this.lastVolume = volume;
-    }
   };
 
   public setValue(volume: number) {

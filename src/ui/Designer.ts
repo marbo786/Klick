@@ -255,7 +255,7 @@ export class Designer {
 
   // Backwards compatibility for main.ts bindings
   public isOpen(): boolean { return false; }
-  public setOpen(open: boolean): void { /* Handled externally now */ }
+  public setOpen(_open: boolean): void { /* Handled externally now */ }
 
   public dispose(): void {
     this.container.innerHTML = '';

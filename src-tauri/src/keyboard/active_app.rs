@@ -27,8 +27,9 @@ pub fn get_active_app_name() -> Option<String> {
         }
 
         let mut buffer = [0u16; MAX_PATH as usize];
-        let len = GetProcessImageFileNameW(process_handle, buffer.as_mut_ptr(), buffer.len() as u32);
-        
+        let len =
+            GetProcessImageFileNameW(process_handle, buffer.as_mut_ptr(), buffer.len() as u32);
+
         CloseHandle(process_handle);
 
         if len > 0 {

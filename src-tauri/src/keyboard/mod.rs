@@ -1,7 +1,7 @@
-pub mod events;
-pub mod mapper;
-pub mod listener;
 pub mod active_app;
+pub mod events;
+pub mod listener;
+pub mod mapper;
 
 use tauri::App;
 
