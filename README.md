@@ -41,47 +41,36 @@ Inspired by vintage analog audio receivers and turntable pitch faders, Klick doe
 
 Klick splits responsibility across a Rust-native backend (system-level key listening) and a TypeScript/WebAudio frontend (sound synthesis):
 
-```
-╔══════════════════════════════════════════════════════════════════════╗
-║                          KLICK SIGNAL PATH                           ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║   [ OS Keystroke ]                                                    ║
-║          │                                                           ║
-║          ▼                                                           ║
-║  ┌─────────────────────┐                                             ║
-║  │  Rust Key Listener  │  ← listener.rs (rdev) captures raw events,  ║
-║  │  (src-tauri)        │    mapper.rs resolves them to key IDs       ║
-║  └──────────┬──────────┘                                             ║
-║             │  Tauri IPC event                                       ║
-║             ▼                                                        ║
-║  ┌─────────────────────┐                                             ║
-║  │  Active App Filter  │  ← active_app.rs checks foreground process  ║
-║  │                     │    against the user's mute list             ║
-║  └──────────┬──────────┘                                             ║
-║             │  key-down / key-up                                     ║
-║             ▼                                                        ║
-║  ┌─────────────────────┐                                             ║
-║  │  Voice Manager      │  ← VoiceManager.ts allocates a Voice per    ║
-║  │  (src/synth)        │    keypress from the active preset          ║
-║  └──────────┬──────────┘                                             ║
-║             │                                                        ║
-║             ▼                                                        ║
-║  ┌─────────────────────┐                                             ║
-║  │  Voice DSP Chain    │  ← NoiseBuffer → bandpass filters →         ║
-║  │                     │    Envelope → sine resonators                ║
-║  └──────────┬──────────┘                                             ║
-║             │                                                        ║
-║             ▼                                                        ║
-║  ┌─────────────────────┐                                             ║
-║  │  Master Bus         │  ← MasterBus.ts mixes voices, drives the    ║
-║  │                     │    live waveform visualizer                  ║
-║  └──────────┬──────────┘                                             ║
-║             │                                                        ║
-║             ▼                                                        ║
-║   [ Headphone Output ]                                                ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
+```mermaid
+flowchart TD
+    A["⌨️ OS Keystroke"] --> B
+
+    subgraph RUST["Rust Backend — src-tauri"]
+        B["Key Listener<br/><code>listener.rs</code> (rdev)<br/>+ <code>mapper.rs</code>"]
+        C["Active App Filter<br/><code>active_app.rs</code><br/>checks mute list"]
+        B --> C
+    end
+
+    C -->|"Tauri IPC<br/>key-down / key-up"| D
+
+    subgraph TS["TypeScript Frontend — src/synth"]
+        D["Voice Manager<br/><code>VoiceManager.ts</code><br/>allocates a Voice per keypress"]
+        E["Voice DSP Chain<br/>NoiseBuffer → Bandpass Filter<br/>→ Envelope → Sine Resonator"]
+        F["Master Bus<br/><code>MasterBus.ts</code><br/>mixes voices, feeds visualizer"]
+        D --> E --> F
+    end
+
+    F --> G["🎧 Headphone Output"]
+
+    style A fill:#1e2327,stroke:#666,color:#fff
+    style G fill:#1e2327,stroke:#666,color:#fff
+    style RUST fill:#000000,stroke:#FFC131,color:#fff
+    style TS fill:#0d1117,stroke:#FF4088,color:#fff
+    style B fill:#161b22,stroke:#FFC131,color:#fff
+    style C fill:#161b22,stroke:#FFC131,color:#fff
+    style D fill:#161b22,stroke:#FF4088,color:#fff
+    style E fill:#161b22,stroke:#FF4088,color:#fff
+    style F fill:#161b22,stroke:#FF4088,color:#fff
 ```
 
 ### Module Responsibilities
