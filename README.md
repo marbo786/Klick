@@ -5,15 +5,16 @@
 ### High-Fidelity Mechanical Keyboard Engine
 
 [![Tauri](https://img.shields.io/badge/Tauri-2.11-FFC131?style=for-the-badge&logo=tauri&logoColor=white)](https://tauri.app)
-[![Rust](https://img.shields.io/badge/Rust-Native_Hooks-000000?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org)
+[![Rust](https://img.shields.io/badge/Rust-rdev-000000?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
 [![WebAudio](https://img.shields.io/badge/WebAudio_API-DSP_Engine-FF4088?style=for-the-badge&logo=webaudio&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
+[![Release](https://img.shields.io/badge/Release-v0.1.0-blue?style=for-the-badge)](https://github.com/marbo786/Klick/releases/tag/v0.1.0)
 [![License](https://img.shields.io/badge/License-MIT-22C55E?style=for-the-badge)](LICENSE)
 
 *Every keystroke, synthesized. Real switch acoustics, zero hardware required.*
 
-[Overview](#-overview) · [Architecture](#️-architecture) · [Tech Stack](#️-tech-stack) · [Project Structure](#-project-structure) · [Getting Started](#-getting-started) · [Usage](#-usage)
+[Overview](#-overview) · [Architecture](#️-architecture) · [Tech Stack](#️-tech-stack) · [Project Structure](#-project-structure) · [Getting Started](#-getting-started) · [Usage](#-usage) · [Download](#-download)
 
 </div>
 
@@ -21,13 +22,13 @@
 
 ## 📌 Overview
 
-**Klick** is a premium, opinionated desktop audio utility for mechanical keyboard enthusiasts and audiophiles. It hooks into global keystrokes at the OS level and runs them through a zero-latency WebAudio synthesizer, producing highly realistic, deeply customizable switch acoustics through your headphones — no physical switches required.
+**Klick** is a premium, opinionated desktop audio utility for mechanical keyboard enthusiasts and audiophiles. It listens for global keystrokes and runs them through a zero-latency WebAudio synthesizer, producing highly realistic, deeply customizable switch acoustics through your headphones — no physical switches required.
 
 Inspired by vintage analog audio receivers and turntable pitch faders, Klick doesn't feel like a settings panel — it feels like a native hardware instrument sitting on your desktop.
 
 **Highlights:**
 
-- 🎹 **Global Key Capture** — Native Windows API hooks (`SetWindowsHookExW`) catch every keystroke system-wide with zero latency
+- 🎹 **Global Key Capture** — Listens for every keystroke system-wide with virtually zero latency
 - 🎚️ **Parametric DSP Engine** — Procedural switch audio from white noise bursts, bandpass filters, envelope generators, and sine resonators — no sample libraries
 - 🛠️ **Tone Arm Designer** — Live sliders for click (transient) and bottom-out (thock) frequency, resonance, decay, low-pass, and noise mix
 - 🔇 **Application Muting** — Auto-mutes when a chosen app (e.g. `Spotify.exe`) is in focus
@@ -38,7 +39,7 @@ Inspired by vintage analog audio receivers and turntable pitch faders, Klick doe
 
 ## 🏗️ Architecture
 
-Klick splits responsibility across a Rust-native backend (system-level hooking) and a TypeScript/WebAudio frontend (sound synthesis):
+Klick splits responsibility across a Rust-native backend (system-level key listening) and a TypeScript/WebAudio frontend (sound synthesis):
 
 ```
 ╔══════════════════════════════════════════════════════════════════════╗
@@ -49,8 +50,8 @@ Klick splits responsibility across a Rust-native backend (system-level hooking) 
 ║          │                                                           ║
 ║          ▼                                                           ║
 ║  ┌─────────────────────┐                                             ║
-║  │  Rust Global Hook   │  ← listener.rs captures raw key events,     ║
-║  │  (src-tauri)        │    mapper.rs resolves scan codes            ║
+║  │  Rust Key Listener  │  ← listener.rs (rdev) captures raw events,  ║
+║  │  (src-tauri)        │    mapper.rs resolves them to key IDs       ║
 ║  └──────────┬──────────┘                                             ║
 ║             │  Tauri IPC event                                       ║
 ║             ▼                                                        ║
@@ -87,13 +88,14 @@ Klick splits responsibility across a Rust-native backend (system-level hooking) 
 
 | # | Module | Role |
 |---|--------|------|
-| 1 | **Global Hook** (`src-tauri/src/keyboard/listener.rs`) | Registers the low-level Windows keyboard hook and forwards raw events over Tauri IPC |
-| 2 | **Key Mapper** (`mapper.rs`) | Translates OS scan codes into normalized key identifiers |
+| 1 | **Key Listener** (`src-tauri/src/keyboard/listener.rs`) | Uses the `rdev` crate to listen for global keyboard events and forwards them over Tauri IPC |
+| 2 | **Key Mapper** (`mapper.rs`) | Translates `rdev` key events into normalized key identifiers |
 | 3 | **Active App Tracker** (`active_app.rs`) | Polls the foreground window to enforce per-application muting |
-| 4 | **Voice Manager** (`src/synth/VoiceManager.ts`) | Allocates and releases synth voices per keystroke, pulling parameters from the active preset |
-| 5 | **Audio Engine** (`AudioEngine.ts`, `Voice.ts`, `Envelope.ts`, `NoiseBuffer.ts`) | Procedurally synthesizes each click/thock from noise + filters + envelopes |
-| 6 | **Master Bus** (`MasterBus.ts`) | Sums all active voices and feeds the waveform visualizer |
-| 7 | **Persistence** (`src/storage/persistence.ts`) | Saves, imports, and exports custom tuning profiles as JSON |
+| 4 | **App Controller** (`src/ui/AppController.ts`) | Wires incoming keyboard IPC events to the audio engine and UI |
+| 5 | **Voice Manager** (`src/synth/VoiceManager.ts`) | Allocates and releases synth voices per keystroke, pulling parameters from the active preset |
+| 6 | **Audio Engine** (`AudioEngine.ts`, `Voice.ts`, `Envelope.ts`, `NoiseBuffer.ts`) | Procedurally synthesizes each click/thock from noise + filters + envelopes |
+| 7 | **Master Bus** (`MasterBus.ts`) | Sums all active voices and feeds the waveform visualizer |
+| 8 | **Persistence** (`src/storage/persistence.ts`) | Saves, imports, and exports custom tuning profiles as JSON |
 
 ---
 
@@ -102,12 +104,11 @@ Klick splits responsibility across a Rust-native backend (system-level hooking) 
 | Layer | Technology |
 |-------|-----------|
 | **Desktop Shell** | Tauri 2 · native system tray · autostart plugin |
-| **System Hooks** | Rust · Windows API (`SetWindowsHookExW`) |
+| **Global Input** | Rust · `rdev` · `windows-sys` (foreground app detection) |
 | **Audio Synthesis** | WebAudio API · custom parametric DSP (noise, bandpass, envelope, resonance) |
 | **Frontend Logic** | TypeScript · Vite 8 |
 | **Styling** | Vanilla CSS (token-based design system, no frameworks) |
 | **Persistence** | JSON-based preset import/export |
-| **Testing** | Playwright · Puppeteer |
 
 ---
 
@@ -118,12 +119,15 @@ Klick/
 ├── src-tauri/
 │   ├── src/
 │   │   ├── keyboard/
-│   │   │   ├── listener.rs     # Global keyboard hook registration
-│   │   │   ├── mapper.rs       # Scan code → key identifier mapping
+│   │   │   ├── listener.rs     # rdev-based global key listener
+│   │   │   ├── mapper.rs       # Key event → key identifier mapping
 │   │   │   ├── events.rs       # Event payload definitions
-│   │   │   └── active_app.rs   # Foreground app detection for muting
+│   │   │   ├── active_app.rs   # Foreground app detection for muting
+│   │   │   └── mod.rs          # Module wiring + init hook
 │   │   ├── lib.rs              # Tauri app setup, command registration
 │   │   └── main.rs             # Entry point
+│   ├── capabilities/
+│   │   └── default.json        # Tauri permission capabilities
 │   ├── icons/                  # Cross-platform app icons
 │   └── tauri.conf.json         # Window, bundle, and permission config
 ├── src/
@@ -134,11 +138,13 @@ Klick/
 │   │   ├── Envelope.ts         # ADSR-style envelope generation
 │   │   ├── NoiseBuffer.ts      # Procedural white noise source
 │   │   ├── MasterBus.ts        # Mix bus + visualizer tap
-│   │   └── KeyProfiles.ts      # Per-key acoustic variation
+│   │   ├── KeyProfiles.ts      # Per-key acoustic variation
+│   │   └── types.ts            # Shared synth type definitions
 │   ├── presets/                # blue · brown · red · silent-red · topre · buckling-spring
 │   ├── storage/
 │   │   └── persistence.ts      # Preset save/import/export
 │   ├── ui/
+│   │   ├── AppController.ts    # Binds keyboard IPC events to app state
 │   │   ├── Designer.ts         # Tone Arm Designer controls
 │   │   ├── InputHandler.ts     # UI input/event wiring
 │   │   ├── PresetSelector.ts   # Preset picker
@@ -146,7 +152,6 @@ Klick/
 │   │   └── WaveformVisualizer.ts  # Live waveform rendering
 │   ├── main.ts                 # Frontend entry point
 │   └── style.css               # Token-based design system
-├── scripts/                    # Playwright/Puppeteer test harnesses
 ├── public/                     # Static assets
 └── index.html
 ```
@@ -158,8 +163,8 @@ Klick/
 ### Prerequisites
 
 - **[Node.js](https://nodejs.org/)** v18+
-- **[Rust](https://www.rust-lang.org/tools/install)** — required to compile the native keyboard hook
-- **Windows OS** — currently optimized for the Windows global hook API
+- **[Rust](https://www.rust-lang.org/tools/install)** — required to compile the backend
+- **Windows OS** — currently optimized for Windows (foreground-app muting relies on `windows-sys`)
 
 ### Installation
 
@@ -181,11 +186,21 @@ npx tauri dev
 npx tauri build
 ```
 
-The standalone `.msi` installer will be generated at:
+The standalone `.msi`/`setup.exe` installer will be generated at:
 
 ```
-src-tauri/target/release/bundle/msi/
+src-tauri/target/release/bundle/
 ```
+
+---
+
+## 📥 Download
+
+The first public build is available on the [Releases page](https://github.com/marbo786/Klick/releases/tag/v0.1.0):
+
+- **[Klick_0.1.0_x64-setup.exe](https://github.com/marbo786/Klick/releases/download/v0.1.0/Klick_0.1.0_x64-setup.exe)** — Windows installer
+
+> Windows SmartScreen may flag the installer as unrecognized since the app is newly published and unsigned — choose **More Info → Run anyway**.
 
 ---
 
