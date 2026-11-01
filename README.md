@@ -14,7 +14,6 @@
 
 *Every keystroke, synthesized. Real switch acoustics, zero hardware required.*
 
-[Overview](#-overview) · [Architecture](#️-architecture) · [Tech Stack](#️-tech-stack) · [Project Structure](#-project-structure) · [Getting Started](#-getting-started) · [Usage](#-usage) · [Download](#-download)
 
 </div>
 
@@ -143,42 +142,6 @@ Klick/
 │   └── style.css               # Token-based design system
 ├── public/                     # Static assets
 └── index.html
-```
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- **[Node.js](https://nodejs.org/)** v18+
-- **[Rust](https://www.rust-lang.org/tools/install)** — required to compile the backend
-- **Windows OS** — currently optimized for Windows (foreground-app muting relies on `windows-sys`)
-
-### Installation
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/marbo786/Klick.git
-cd Klick
-
-# 2. Install frontend dependencies
-npm install
-
-# 3. Launch the dev build (compiles the Rust backend + starts the app)
-npx tauri dev
-```
-
-### Building for Production
-
-```bash
-npx tauri build
-```
-
-The standalone `.msi`/`setup.exe` installer will be generated at:
-
-```
-src-tauri/target/release/bundle/
 ```
 
 ---
